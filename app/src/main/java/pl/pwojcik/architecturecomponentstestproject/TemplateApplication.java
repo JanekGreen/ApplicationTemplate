@@ -1,31 +1,33 @@
 package pl.pwojcik.architecturecomponentstestproject;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
-import android.content.Context;
 
-import pl.pwojcik.architecturecomponentstestproject.model.persistence.AppDatabase;
+import pl.pwojcik.architecturecomponentstestproject.di.AppModule;
+import pl.pwojcik.architecturecomponentstestproject.di.DaggerNetworkComponent;
+import pl.pwojcik.architecturecomponentstestproject.di.NetworkComponent;
+import pl.pwojcik.architecturecomponentstestproject.di.NetworkModule;
+
 
 /**
  * Created by pawel on 01.02.18.
  */
 
 public class TemplateApplication extends Application {
-    private static AppDatabase db;
+
+    NetworkComponent networkComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        networkComponent = DaggerNetworkComponent.builder()
+                .networkModule(new NetworkModule())
+                .appModule(new AppModule(getApplicationContext()))
+                .build();
     }
 
-    public static AppDatabase getInstance(Context context) {
-        if (db == null) {
-            db = Room
-                    .databaseBuilder(context, AppDatabase.class, "githubDb")
-                    .build();
-        }
-
-        return db;
+    public NetworkComponent getNetworkComponent(){
+        return networkComponent;
     }
 
 }
